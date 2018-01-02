@@ -925,59 +925,6 @@ define('services/tweeter-service',['exports', 'aurelia-framework', 'aurelia-rout
   }()) || _class);
   exports.default = TweeterService;
 });
-define('viewmodels/firehose/firehose',['exports', 'aurelia-framework', 'aurelia-event-aggregator', './../../services/tweeter-service', '../../services/messages'], function (exports, _aureliaFramework, _aureliaEventAggregator, _tweeterService, _messages) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.Firehose = undefined;
-
-  var _tweeterService2 = _interopRequireDefault(_tweeterService);
-
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : {
-      default: obj
-    };
-  }
-
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  var _dec, _class;
-
-  var Firehose = exports.Firehose = (_dec = (0, _aureliaFramework.inject)(_tweeterService2.default, _aureliaEventAggregator.EventAggregator), _dec(_class = function () {
-    function Firehose(ts, ea) {
-      var _this = this;
-
-      _classCallCheck(this, Firehose);
-
-      this.firehoseTweets = [];
-
-      this.service = ts;
-      this.evtAgg = ea;
-
-      this.evtAgg.subscribe(_messages.TweetUpdate, function (msg) {
-        if (msg.tweetSection === _this.service.FIREHOSE_LABEL) {
-          _this.firehoseTweets = _this.service.firehoseTweets;
-        }
-      });
-    }
-
-    Firehose.prototype.attached = function attached() {
-      this.refreshFirehose();
-    };
-
-    Firehose.prototype.refreshFirehose = function refreshFirehose() {
-      this.service.getFirehoseTweets();
-    };
-
-    return Firehose;
-  }()) || _class);
-});
 define('viewmodels/browse-users/browse-users',['exports', 'aurelia-framework', 'aurelia-event-aggregator', '../../services/tweeter-service', '../../services/messages'], function (exports, _aureliaFramework, _aureliaEventAggregator, _tweeterService, _messages) {
   'use strict';
 
@@ -1093,6 +1040,59 @@ define('viewmodels/followings/followings',['exports', 'aurelia-framework', 'aure
     };
 
     return Followings;
+  }()) || _class);
+});
+define('viewmodels/firehose/firehose',['exports', 'aurelia-framework', 'aurelia-event-aggregator', './../../services/tweeter-service', '../../services/messages'], function (exports, _aureliaFramework, _aureliaEventAggregator, _tweeterService, _messages) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.Firehose = undefined;
+
+  var _tweeterService2 = _interopRequireDefault(_tweeterService);
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {
+      default: obj
+    };
+  }
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  var _dec, _class;
+
+  var Firehose = exports.Firehose = (_dec = (0, _aureliaFramework.inject)(_tweeterService2.default, _aureliaEventAggregator.EventAggregator), _dec(_class = function () {
+    function Firehose(ts, ea) {
+      var _this = this;
+
+      _classCallCheck(this, Firehose);
+
+      this.firehoseTweets = [];
+
+      this.service = ts;
+      this.evtAgg = ea;
+
+      this.evtAgg.subscribe(_messages.TweetUpdate, function (msg) {
+        if (msg.tweetSection === _this.service.FIREHOSE_LABEL) {
+          _this.firehoseTweets = _this.service.firehoseTweets;
+        }
+      });
+    }
+
+    Firehose.prototype.attached = function attached() {
+      this.refreshFirehose();
+    };
+
+    Firehose.prototype.refreshFirehose = function refreshFirehose() {
+      this.service.getFirehoseTweets();
+    };
+
+    return Firehose;
   }()) || _class);
 });
 define('viewmodels/login/login',['exports', 'aurelia-framework', 'aurelia-event-aggregator', 'aurelia-validation', '../../services/tweeter-service', '../../services/messages'], function (exports, _aureliaFramework, _aureliaEventAggregator, _aureliaValidation, _tweeterService, _messages) {
@@ -1894,15 +1894,15 @@ define('text!partials/tweets-list.html', ['module'], function(module) { module.e
 define('text!viewmodels/browse-users/browse-users.html', ['module'], function(module) { module.exports = "<template><require from=\"./../../partials/no-content.html\"></require><div class=\"ui raised segment\"><h3 class=\"ui dividing header\">Browse users <a click.delegate=\"refreshUsers()\" class=\"ui blue label\"><i class=\"refresh icon\"></i> Refresh</a></h3><div class=\"ui stackable cards\" if.bind=\"users.length > 0\"><div class=\"ui card\" repeat.for=\"user of users\"><div class=\"content\"><i class=\"right floated user circle big icon\"></i><div class=\"header\">${user.nickname}</div><div class=\"meta\">${user.email}</div></div><div class=\"extra centered content\"><button click.delegate=\"viewUser(user._id)\" class=\"ui fluid orange labeled icon button\"><i class=\"arrow circle outline right large icon\"></i> View timeline</button></div></div></div><no-content if.bind=\"users.length === 0\" containerless text.bind=\"'No tweets available'\"></no-content></div></template>"; });
 define('text!viewmodels/firehose/firehose.html', ['module'], function(module) { module.exports = "<template><require from=\"./../../partials/tweets-list.html\"></require><div class=\"ui raised segment\"><h3 class=\"ui dividing header\">Firehose - All tweets <a click.delegate=\"refreshFirehose()\" class=\"ui blue label\"><i class=\"refresh icon\"></i> Refresh</a></h3><div class=\"ui two column grid\"><div class=\"nine wide column\"><tweets-list containerless tweets.bind=\"firehoseTweets\"></tweets-list></div><aside class=\"seven wide centered column\"><div class=\"ui centered raised card\"><div class=\"center aligned image\"><i class=\"massive icons\"><i class=\"sun big orange loading icon\"></i> <i class=\"twitter icon\"></i></i></div><div class=\"center aligned content\"><h3 class=\"ui header\">Displaying</h3><div class=\"ui orange inverted large header\">${firehoseTweets.length}</div><h3 class=\"ui header\">Messages</h3></div></div></aside></div></div></template>"; });
 define('text!viewmodels/followings/followings.html', ['module'], function(module) { module.exports = "<template><require from=\"./../../partials/tweets-list.html\"></require><div class=\"ui raised segment\"><h3 class=\"ui dividing header\">Followings <a click.delegate=\"refreshFollowings()\" class=\"ui blue label\"><i class=\"refresh icon\"></i> Refresh</a></h3><div class=\"ui two column grid\"><div class=\"nine wide column\"><tweets-list containerless tweets.bind=\"followingsTweets\"></tweets-list></div><aside class=\"seven wide centered column\"><div class=\"ui raised segment\"><h4 class=\"ui header\">Following</h4><div class=\"ui middle aligned divided selection link list\" if.bind=\"followingsUsers.length > 0\"><a class=\"item\" repeat.for=\"user of followingsUsers\" click.delegate=\"viewUser(user._id)\"><i class=\"user circle outline large icon\"></i><div class=\"content\"> ${user.nickname} </div></a></div><strong if.bind=\"followingsUsers.length === 0\">---</strong></div></aside></div></div></template>"; });
-define('text!viewmodels/login/login.html', ['module'], function(module) { module.exports = "<template><require from=\"./../../partials/formerror.html\"></require><section class=\"ui raised segment\"><div class=\"ui middle aligned two column grid\"><div class=\"column\"><div class=\"ui fluid raised form segment\"><a route-href=\"adm-login\" class=\"ui red right corner label\"><i class=\"setting icon\"></i></a><form submit.delegate=\"login($event)\"><h3 class=\"ui header\">Log in to Tweeter</h3><div class=\"field\"><label>Email</label><input placeholder=\"Email\" type=\"text\" value.bind=\"email & validate\"></div><div class=\"field\"><label>Password</label><input type=\"password\" value.bind=\"password & validate\"></div><button class=\"ui orange submit button\">Login</button></form><formerror controller.bind=\"valContr\" containerless></formerror></div></div><aside class=\"column\"><compose containerless view=\"./../../partials/tweeter-card.html\"></compose></aside></div></section></template>"; });
 define('text!viewmodels/logout/logout.html', ['module'], function(module) { module.exports = "<template><section class=\"ui middle aligned center aligned raised segment\"><form submit.delegate=\"logout($event)\" class=\"ui form\"><h3 class=\"ui header\">Sure you want to log out?</h3><button class=\"ui blue orange button\">Yes</button></form></section></template>"; });
+define('text!viewmodels/login/login.html', ['module'], function(module) { module.exports = "<template><require from=\"./../../partials/formerror.html\"></require><section class=\"ui raised segment\"><div class=\"ui middle aligned two column grid\"><div class=\"column\"><div class=\"ui fluid raised form segment\"><a route-href=\"adm-login\" class=\"ui red right corner label\"><i class=\"setting icon\"></i></a><form submit.delegate=\"login($event)\"><h3 class=\"ui header\">Log in to Tweeter</h3><div class=\"field\"><label>Email</label><input placeholder=\"Email\" type=\"text\" value.bind=\"email & validate\"></div><div class=\"field\"><label>Password</label><input type=\"password\" value.bind=\"password & validate\"></div><button class=\"ui orange submit button\">Login</button></form><formerror controller.bind=\"valContr\" containerless></formerror></div></div><aside class=\"column\"><compose containerless view=\"./../../partials/tweeter-card.html\"></compose></aside></div></section></template>"; });
 define('text!viewmodels/settings/settings.html', ['module'], function(module) { module.exports = "<template><require from=\"./../../partials/formerror.html\"></require><section class=\"ui raised segment\"><div class=\"ui middle aligned two column grid\"><div class=\"column\"><div class=\"ui fluid raised form segment\"><form submit.delegate=\"changeSettings($event)\"><h3 class=\"ui header\">Change settings</h3><div class=\"two fields\"><div class=\"field\"><label>Nickname</label><input placeholder=\"Your nickname\" type=\"text\" value.bind=\"userData.nickname & validate\" autofocus></div></div><div class=\"field\"><label>E-Mail</label><input placeholder=\"Email\" type=\"text\" value.bind=\"userData.email & validate\"></div><div class=\"field\"><label>Password</label><input type=\"password\" value.bind=\"userData.password & validate\"></div><button class=\"ui orange submit button\">Submit</button></form><formerror controller.bind=\"valContr\" containerless></formerror></div></div><aside class=\"column\"><compose containerless view=\"./../../partials/tweeter-card.html\"></compose></aside></div></section></template>"; });
 define('text!viewmodels/signup/signup.html', ['module'], function(module) { module.exports = "<template><require from=\"./../../partials/formerror.html\"></require><section class=\"ui raised segment\"><div class=\"ui middle aligned two column grid\"><div class=\"column\"><div class=\"ui raised fluid form segment\"><form submit.delegate=\"register($event)\"><h3 class=\"ui header\">Sign up to Tweeter</h3><div class=\"two fields\"><div class=\"field\"><label>Nickname</label><input placeholder=\"Your nickname\" type=\"text\" value.bind=\"nickname & validate\" autofocus></div></div><div class=\"field\"><label>E-Mail</label><input placeholder=\"E-Mail Address\" type=\"text\" value.bind=\"email & validate\"></div><div class=\"field\"><label>Password</label><input type=\"password\" value.bind=\"password & validate\"></div><button class=\"ui orange submit button\">Submit</button></form><formerror controller.bind=\"valContr\" containerless></formerror></div></div><aside class=\"column\"><compose containerless view=\"./../../partials/tweeter-card.html\"></compose></aside></div></section></template>"; });
 define('text!viewmodels/view-user/view-user.html', ['module'], function(module) { module.exports = "<template><require from=\"./../../partials/tweets-list.html\"></require><div class=\"ui raised segment\"><h3 class=\"ui dividing header\"> ${viewUser.nickname} <a route-href=\"route: yourtweets\" class=\"ui label\"><i class=\"left arrow icon\"></i> Back</a></h3><div class=\"ui two column grid\"><div class=\"nine wide column\"><tweets-list containerless tweets.bind=\"viewUserTweets\"></tweets-list></div><aside class=\"seven wide centered column\"><div class=\"ui raised segment\"><div class=\"ui card\"><div class=\"content\"><i class=\"right floated user circle big icon\"></i><div class=\"header\">${viewUser.nickname}</div><div class=\"meta\">${viewUser.email}</div><div class=\"description\"><i class=\"twitter large icon\"></i> ${viewUserFollowingsCount} </div></div><div class=\"extra centered content\"><button click.delegate=\"doFollowingAction()\" class=\"ui fluid orange labeled icon button\"><i class=\"${isFollowedUser ? 'minus' : 'plus'} large icon\"></i> ${isFollowedUser ? 'Stop following!' : 'Follow!'} </button></div></div></div></aside></div></div></template>"; });
 define('text!viewmodels/wall/wall.html', ['module'], function(module) { module.exports = "<template><require from=\"./../../partials/formerror.html\"></require><require from=\"./../../partials/no-content.html\"></require><require from=\"./../../helpers/date-format\"></require><require from=\"./../../helpers/file-list-to-array\"></require><require from=\"./../../helpers/blob-to-url\"></require><require from=\"./../../helpers/data-uri\"></require><section class=\"ui raised segment\"><h3 class=\"ui dividing header\">Your tweets <a click.delegate=\"refreshWall()\" class=\"ui blue label\"><i class=\"refresh icon\"></i> Refresh</a></h3><div class=\"ui two column grid\"><div class=\"nine wide column\"><article class=\"ui compact segment\" repeat.for=\"tweet of userTweets\"><h5 class=\"ui dividing header\"> ${tweet.user.nickname} <div class=\"sub header\"> ${tweet.creation | dateFormat} </div></h5><a class=\"ui top right attached label\" click.delegate=\"removeTweet(tweet._id)\"><i class=\"orange remove icon\"></i></a><p>${tweet.message}</p><div class=\"ui medium bordered image\" if.bind=\"tweet.image\"><img src.bind=\"tweet.image | dataUri\" alt=\"tweet-image\"></div></article><no-content if.bind=\"userTweets.length === 0\" containerless text.bind=\"'No tweets available'\"></no-content></div><aside class=\"seven wide centered column\"><div class=\"ui raised fluid form segment\" id=\"tweet-form\"><form submit.delegate=\"makeTweet($event)\" accept=\"image/jpeg\" enctype=\"multipart/form-data\"><h3 class=\"ui header\">Make a tweet!</h3><div class=\"ui top right attached label\" id=\"tweet-label\">${message.trim().length} / 140</div><div class=\"field\"><textarea value.bind=\"message & validate\" maxlength=\"140\" rows=\"2\"></textarea></div><div class=\"field\"><input ref=\"fileInput\" type=\"file\" files.bind=\"image & validate\" accept=\"image/jpeg\"></div><button class=\"ui orange ${message.length === 0 ? 'disabled' : ''} submit button\">Share</button> <button class=\"ui button\" click.delegate=\"clearTweetForm()\">Clear</button></form><div class=\"ui basic center aligned segment\" if.bind=\"image.length > 0\"><div class=\"ui medium bordered image\"><img repeat.for=\"img of image | fileListToArray\" src.bind=\"img | blobToUrl\" alt=\"tweet-image\"></div></div><formerror controller.bind=\"valContr\" containerless></formerror></div></aside></div></section></template>"; });
 define('text!viewmodels/welcome/welcome.html', ['module'], function(module) { module.exports = "<template><section class=\"ui raised segment\"><div class=\"ui two column middle aligned grid\"><div class=\"column\"><div class=\"ui raised segment\"><header class=\"ui dividing center aligned header\">Final project app - Markus Biersack</header><ul class=\"ui left aligned list\"><li>Single page application using Aurelia deployed on Github: <a href=\"https://bim41337.github.io/dmas-twitter-deployment/\">Tweeter-SPA@Github</a></li><li>Full SPA source project on Github with commit history: <a href=\"https://github.com/bim41337/dmas-twitter-app-client\">SPA-Sources@Github</a></li><li>API backend deployed at Heroku: <a href=\"https://tweeter-bim41337.herokuapp.com/\">Tweeter-Backend@Heroku</a></li><li>Backend source project on Github with commit history: <a href=\"https://github.com/bim41337/dmas-twitter-app\">Backend-Sources@Github</a><br>Also includes sources for server rendered version of the app which was developed until the labs for the Aurelia client were fully visible</li></ul></div></div><div class=\"column\"><compose containerless view=\"./../../partials/tweeter-card.html\"></compose></div></div></section></template>"; });
 define('text!viewmodels/admin/login/login.html', ['module'], function(module) { module.exports = "<template><require from=\"./../../../partials/formerror.html\"></require><section class=\"ui raised segment\"><div class=\"ui middle aligned two column grid\"><div class=\"column\"><div class=\"ui fluid raised form segment\"><form submit.delegate=\"login($event)\"><h3 class=\"ui header\">Administration login</h3><div class=\"field\"><label>Password</label><input type=\"password\" value.bind=\"password & validate\"></div><button class=\"ui orange submit button\">Login</button></form><formerror containerless controller.bind=\"valContr\"></formerror></div></div><aside class=\"column\"><div class=\"ui centered raised card\"><div class=\"center aligned image\"><i class=\"settings massive red icon\"></i></div><div class=\"center aligned content\"><h3 class=\"ui header\">Tweeter administration</h3></div></div></aside></div></section></template>"; });
-define('text!viewmodels/admin/stats/stats.html', ['module'], function(module) { module.exports = "<template><div class=\"ui raised segment\"><h3 class=\"ui dividing header\">Tweeter statistics <a click.delegate=\"refreshView()\" class=\"ui blue label\"><i class=\"refresh icon\"></i> Refresh</a></h3><table class=\"ui striped celled table\"><tbody><tr><td>Users registered</td><td>${usersCount}</td></tr><tr><td>Tweets visible</td><td>${tweetsCount}</td></tr><tr><td>User connections (Followings)</td><td>${connectionsCount}</td></tr></tbody></table></div></template>"; });
 define('text!viewmodels/admin/tweets/tweets.html', ['module'], function(module) { module.exports = "<template><require from=\"./../../../partials/no-content.html\"></require><require from=\"./../../../helpers/date-format\"></require><require from=\"./../../../helpers/data-uri\"></require><div class=\"ui raised segment\"><h3 class=\"ui dividing header\">Tweet administration <a click.delegate=\"refreshTweets()\" class=\"ui blue label\"><i class=\"refresh icon\"></i> Refresh</a></h3><button class=\"ui red labeled small icon button ${selectedTweets.length > 0 ? '' : 'disabled'}\" click.delegate=\"removeSelectedTweets()\"><i class=\"trash icon\"></i> Remove selected</button><table class=\"ui striped celled table\" if.bind=\"allTweets.length > 0\"><thead><tr><th class=\"one wide\">&nbsp;</th><th class=\"three wide\">Data</th><th class=\"eleven wide\">Content</th><th class=\"one wide\">&nbsp;</th></tr></thead><tbody><tr repeat.for=\"tweet of allTweets\"><td>${$index + 1}</td><td><h5 class=\"ui header\"> ${tweet.user.nickname} <div class=\"sub header\"> ${tweet.creation | dateFormat} </div></h5></td><td><p>${tweet.message}</p><div class=\"ui divider\" if.bind=\"tweet.image\"></div><div class=\"ui bordered image\" if.bind=\"tweet.image\"><img src.bind=\"tweet.image | dataUri\" alt=\"tweet-image\"></div></td><td><div class=\"ui checkbox\"><input type=\"checkbox\" model.bind=\"tweet\" checked.bind=\"selectedTweets\"><label>&nbsp;</label></div><div class=\"ui vertical hidden divider\"></div><button class=\"ui mini red icon button\" show.bind=\"selectedTweets.length === 0\" click.delegate=\"removeSingleTweet(tweet._id)\"><i class=\"trash icon\"></i></button></td></tr></tbody></table><no-content if.bind=\"allTweets.length === 0\" containerless text.bind=\"'No tweets available'\"></no-content></div></template>"; });
+define('text!viewmodels/admin/stats/stats.html', ['module'], function(module) { module.exports = "<template><div class=\"ui raised segment\"><h3 class=\"ui dividing header\">Tweeter statistics <a click.delegate=\"refreshView()\" class=\"ui blue label\"><i class=\"refresh icon\"></i> Refresh</a></h3><table class=\"ui striped celled table\"><tbody><tr><td>Users registered</td><td>${usersCount}</td></tr><tr><td>Tweets visible</td><td>${tweetsCount}</td></tr><tr><td>User connections (Followings)</td><td>${connectionsCount}</td></tr></tbody></table></div></template>"; });
 define('text!viewmodels/admin/users/users.html', ['module'], function(module) { module.exports = "<template><require from=\"./../../../partials/no-content.html\"></require><div class=\"ui raised segment\"><h3 class=\"ui dividing header\">User administration <a click.delegate=\"refreshUsers()\" class=\"ui blue label\"><i class=\"refresh icon\"></i> Refresh</a></h3><button class=\"ui red labeled small icon button ${selectedUsers.length > 0 ? '' : 'disabled'}\" click.delegate=\"removeSelectedUsers()\"><i class=\"trash icon\"></i> Remove selected</button><div class=\"ui middle aligned divided relaxed list\" if.bind=\"allUsers.length > 0\"><div class=\"item\" repeat.for=\"user of allUsers\"><div class=\"right floated content\"><div class=\"ui checkbox\"><input type=\"checkbox\" model.bind=\"user\" checked.bind=\"selectedUsers\"><label>&nbsp;</label></div><div class=\"ui vertical hidden divider\"></div><button class=\"ui mini red icon button\" show.bind=\"selectedUsers.length === 0\" click.delegate=\"removeSingleUser(user._id)\"><i class=\"trash icon\"></i></button></div><i class=\"user circle outline big icon\"></i><div class=\"content\"><h5 class=\"header\">${user.nickname}</h5><div class=\"description\">${user._id}</div></div></div></div><no-content if.bind=\"allUsers.length === 0\" containerless text.bind=\"'No users registered'\"></no-content></div></template>"; });
 //# sourceMappingURL=app-bundle.js.map
